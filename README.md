@@ -1,0 +1,1 @@
+Bu projede Valentina Studio programını kullanarak Sql dilinde bir veritabanı oluşturdum ve detaylıca hazırladığım Mahkeme sisteminde kişiler ve bağlantılı olduğu nesneler arasındaki ilişkileri oluşturdum. Draw.io kullanarak bu ilişki şemasını çıkardım ve kurduğum bu sistemi C# dilinde ufak bir uygulama yazarak veri tabanımdan veri çekerek gerçekledim.
