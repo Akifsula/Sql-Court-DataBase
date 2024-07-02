@@ -1,0 +1,82 @@
+
+
+
+Mahkeme Salonlardan oluşur. Salonların kapasitesi ve blok bilgisi mevcuttur ve birbirlerinden Salon numarasıyla ayrılırlar.
+Mahkemelerin Mahkeme numarası ve adı vardır.
+Adresler koordinatlarına göre belirlenir. Her adresin İl ve İlçe bilgisi mevcuttur.
+Bir mahkeme yalnızca bir adreste bulunur. Bir adreste hiç mahkeme bulunmayabilir, birden çok mahkeme de bulunabilir.
+bir mahkemede en az 1 en çok çok kişi vardır. bir kişi en az sıfır en çok çok mahkemede bulunur. 
+Kişiler Yetkili ve vatandaş olarak ikiye ayrılır. her bir kişi Tc kimlik numarasıyla ayırt edilir ve her kişinin adı,soyadı,telefon numarası ve cinsiyeti vardır.
+Bir kişi ya yetkili ya vatandaş ya da her ikisi birden olabilir. 
+Mahkemedeki toplam kişi ve personal sayısı da kayıt altında tutulmalıdır.
+Kişi eğer yetkiliyse avukat,hakim ya da savcıdan yalnızca biri olmak zorundadır. Vatandaş ise davalı(sanık),davacı ya da şahit olabilir. hiçbiri olmayadabilir.
+yetkililerin sicil no bilgisi vardır ve mesleklerine göre Hakim,Avukat ve Savcı olarak ayrılırlar.
+vatandaşların medeni hal(evli,bekar) ve email bilgisi mevcuttur. Vatandaşlar rollerine göre (Davalı,Davacı,Şahit) ayrılırlar.
+Bir kişi yalnızca bir adreste bulunur. Bir adreste hiç kişi bulunmayabilir, birden çok kişi de bulunabilir.
+hakimlerin kıdemlilik derecesi, avukatların ise uzmanlık alanları vardır.
+savcıların yetkisi, çalışma günü ve çalışma saati bilgileri mevcuttur.
+Davacıların cinsiyeti ve meslekleri kayıt altında tutulur.
+Davalı sanıkların yaş bilgisi ve sabıkası(temiz,kirli) vardır.
+Şahitlerin tanıklık türü bilgisi vardır. 
+bir şahit en az bir suça tanıklık etmek zorundadır. Birden çok şuta da tanıklık edebilir. Bir suça hiç kimse tanıklık etmemiş olabilir ya da birden çok şahit tanıklık edebilir.
+
+Bir davacı en az bir en çok çok dava açar. Bir dava en az bir en çok bir davacı tarafından açılır.
+bir davacı en az sıfır en çok bir avukat tarafından savunulur. Bir avukat en az bir en çok çok davacıyı savunur.
+Davalar birbirinden dava numaraları ile ayrılır. Her davanın tarihi ve saati vardır.
+Bir hakim en az bir en çok çok davayı yönetir. Bir dava yalnızca bir hakim tarafından yönetilir.
+Cezalar ceza numaralarına göre ayrılır ve her cezanın türü,miktarı ve caydırıcılık seviyesi vardır.
+bir hakim, hiç ceza vermeyebileceği gibi birden çok ceza da verebilir. Bir ceza yalnızca bir hakim tarafından verilir.
+
+Suçların numaraları ve türleri vardır.
+Bir davalı hiç suç işlememiş olabilir ya da birden fazla suç işlemiş olabilir. Bir suç hiç işlenmemiş ya da birden çok davalı tarafından işlenmiş olabilir.
+işlenilen suçların tarihi,saati ve şehir bilgileri de önemlidir.
+
+kanıtlar kanıt numaralarına göre listelenir. Derece(doğrudan,dolaylı) ve tutarlılık özelliklerine sahiptirler.
+bir kanıt yalnızca bir savcı tarafından bulunur. Bir savcı hiç kanıt bulamayabilir ya da birden çok kanıt bulabilir.
+bir savcı en fazla bir suçu araştırabilir ya da hiçbir suçu araştırmaz. bir suç, hiçbir savcı tarafından araştırılmaz ya da en fazla bir savcı tarafından araştırılır.
+
+bir davalı hiç sorgulanmayabilir ya da yalnızca bir savcı tarafından sorgulanır. Bir savcı birden çok davalıyı sorgulayabilir ya da hiç davalıyı sorgulamayabilir.
+bir davalı hiç avukata danışmayabilir ya da birden çok avukata danışır. bir avukat yalnızca bir davalı tarafından danışılmak zorundadır.
+dava dosyaları savcılar tarafından oluşturulur ve Karar numaraları, Tutanak numaraları vardır. Birbirlerinden dosya numaraları ile ayrılırlar.
+Bir dava dosyası yalnızca bir savcı tarafından oluşturulmak zorundadır. Bir savcı hiç dava dosyası oluşturmayabilir ya da birden çok dosya oluşturabilir.
+bir avukat en az bir dava dosyası incelemek zorundadır. Birden fazla dava dosyası da inceleyebilir. Bir dava dosyası yalnızca bir avukat tarafından incelenir.
+DavaDosyası tablosu içerisindeki bir Dosya, sıfır veya daha fazla Dosya ile aynı zamanda İlişkilidir. Bir Dosyanın sıfır ya da bir Dosyayla İlişkisi Olmalıdır.
+bir davacı hiç avukata danışmayabilir ya da birden çok avukata danışır. bir avukat yalnızca bir davacı tarafından danışılmak zorundadır.
+bir davalı en az sıfır en çok bir avukat tarafından savunulur. Bir avukat en az bir en çok çok davalıyı savunur.
+
+
+
+
+
+
+BEGIN;
+
+-- CREATE TABLE "MahkemeKisi" ----------------------------------
+CREATE TABLE "public"."MahkemeKisi" ( 
+	"ToplamKisi" Integer NOT NULL,
+	"SucluSayisi" Integer NOT NULL,
+	"MahkemeNo" Integer NOT NULL,
+	"TcKimlikNo" Integer NOT NULL,
+	PRIMARY KEY ( "MahkemeNo", "TcKimlikNo" ),
+	CONSTRAINT "unique_MahkemeKisi_MahkemeNo" UNIQUE( "MahkemeNo" ),
+	CONSTRAINT "unique_MahkemeKisi_TcKimlikNo" UNIQUE( "TcKimlikNo" ) );
+ ;
+-- -------------------------------------------------------------
+
+COMMIT;
+
+BEGIN;
+
+-- CREATE LINK "bulunur" ---------------------------------------
+ALTER TABLE "public"."MahkemeKisi"
+	ADD CONSTRAINT "bulunur" FOREIGN KEY ( "MahkemeNo" )
+	REFERENCES "public"."Mahkeme" ( "MahkemeNo" ) MATCH FULL
+	ON DELETE Cascade
+	ON UPDATE Cascade;
+-- -------------------------------------------------------------
+
+COMMIT;
+
+
+
+
