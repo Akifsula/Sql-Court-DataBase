@@ -1,0 +1,176 @@
+##The functions and triggers in this code show what results will occur in the database when a new operation is made from the application:
+
+1)Displays the name of the most crowded court and the total number of people inside as a table. 
+function: (en kalablık mahkemenin ismini ve içerideki toplam kişiyi tablo olarak ekrana veren fonksiyon)
+
+CREATE OR REPLACE FUNCTION enkalabalikmahkeme()
+RETURNS TABLE (mahkeme_adi character varying, toplam_kisi integer) AS $$
+BEGIN
+ RETURN QUERY
+ SELECT "public"."Mahkeme"."MahkemeAdi", MAX("public"."MahkemeKisi"."ToplamKisi") AS 
+"ToplamKisiSayisi"
+ FROM "public"."Mahkeme"
+ JOIN "public"."MahkemeKisi" ON "public"."Mahkeme"."MahkemeNo" = 
+"public"."MahkemeKisi"."MahkemeNo"
+ GROUP BY "public"."Mahkeme"."MahkemeNo"
+ ORDER BY "ToplamKisiSayisi" DESC
+ LIMIT 1;
+END;
+$$ LANGUAGE plpgsql; 
+
+
+
+
+2)Subtract the number of personnel from the total number of people in the courts and calculate the number of civilians inside. 
+calculating function: (mahkemelerdeki toplam kişi sayısından personal sayısını çıkartıp içerideki sivil sayısını hesaplayan fonksiyon)
+
+CREATE OR REPLACE FUNCTION sivil_sayisi_hesapla()
+RETURNS TABLE (
+ "MahkemeAdi" character varying,
+ "SivilSayisi" integer
+) AS $$
+BEGIN
+ RETURN QUERY
+ SELECT DISTINCT ON ("public"."Mahkeme"."MahkemeNo")
+ "public"."Mahkeme"."MahkemeAdi",
+ "public"."MahkemeKisi"."ToplamKisi" - "public"."MahkemeKisi"."PersonalSayisi" AS "SivilSayisi"
+ FROM
+ "public"."Mahkeme"
+ JOIN "public"."MahkemeKisi" ON "public"."Mahkeme"."MahkemeNo" = 
+"public"."MahkemeKisi"."MahkemeNo"
+ ORDER BY "public"."Mahkeme"."MahkemeNo", "public"."MahkemeKisi"."ToplamKisi" DESC;
+END;
+$$ LANGUAGE plpgsql; 
+
+
+
+3)When a new person is added to the contact list, the court with the least number of people in the Court Contact table 
+Trigger that increases the total number of rows with the number by 1: (Kişi listesine yeni biri eklendiğinde MahkemeKisi 
+tablosundaki en az kişi içeren mahkeme numarasına sahip satırların toplamkisi sayısını 1 arttıran tetikleyici)
+
+CREATE OR REPLACE FUNCTION update_mahkeme_kisi()
+RETURNS TRIGGER AS $$
+BEGIN
+ UPDATE "MahkemeKisi"
+ SET "ToplamKisi" = "ToplamKisi" + 1
+ WHERE "ToplamKisi" = (SELECT MIN("ToplamKisi") FROM "MahkemeKisi");
+ RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+CREATE TRIGGER trig_after_insert_kisi
+AFTER INSERT ON "Kisi"
+FOR EACH ROW
+EXECUTE FUNCTION update_mahkeme_kisi();
+
+
+
+4)Trigger that reduces the total number of people in the rows with the court number containing the most people in the CourtPerson 
+table by 1 when a new person is deleted from the person list. (Kişi listesinden yeni biri silindiğinde MahkemeKisi tablosundaki 
+en çok kişi içeren mahkeme numarasına sahip satırların toplamkisi sayısını 1 azaltan tetikleyici)
+
+CREATE OR REPLACE FUNCTION delete_mahkeme_kisi()
+RETURNS TRIGGER AS $$
+BEGIN
+ UPDATE "MahkemeKisi"
+ SET "ToplamKisi" = "ToplamKisi" - 1
+ WHERE "ToplamKisi" = (SELECT MAX("ToplamKisi") FROM "MahkemeKisi");
+ RETURN OLD;
+END;
+$$ LANGUAGE plpgsql;
+CREATE TRIGGER trig_after_delete_kisi
+AFTER DELETE ON "Kisi"
+FOR EACH ROW
+EXECUTE FUNCTION delete_mahkeme_kisi();
+
+
+
+5) When a new person is added to the contact list, if the name of the added person is already in the list, 
+Trigger that puts a “*” sign next to the person's name: (Kişi listesine yeni biri eklendiğinde eklenen kişinin adı zaten listede mevcutsa eklediği 
+kişinin adının yanına “*” işareti koyan tetikleyici)
+
+CREATE OR REPLACE FUNCTION insert_kisi_check_duplicate()
+RETURNS TRIGGER AS $$
+DECLARE
+ existing_count INTEGER;
+BEGIN
+ -- Girdiğim Ad değerinden kaç tane kayıt olduğunu kontrol eder
+ SELECT COUNT(*)
+INTO existing_count
+ FROM "Kisi"
+ WHERE "Ad" = NEW."Ad";
+ IF existing_count > 0 THEN
+ NEW."Ad" := NEW."Ad" || '*';
+ END IF;
+ RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+CREATE TRIGGER trig_before_insert_kisi
+BEFORE INSERT ON "Kisi"
+FOR EACH ROW
+EXECUTE FUNCTION insert_kisi_check_duplicate();
+
+
+6)Data is enlarged so that it is obvious that newly added people are added to the contact list later. 
+Trigger that prints letters: (Kişi listesine yeni eklenen kisilerin sonradan eklendiği belli olsun diye verileri büyük 
+harfle yazdıran tetikleyici)
+
+CREATE OR REPLACE FUNCTION kisi_ekle_trigger()
+RETURNS TRIGGER AS $$
+BEGIN
+ NEW."Ad" := UPPER(NEW."Ad");
+ NEW."Soyad" := UPPER(NEW."Soyad");
+ RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+CREATE TRIGGER kisi_ekle_trigger
+BEFORE INSERT ON public."Kisi"
+FOR EACH ROW EXECUTE FUNCTION kisi_ekle_trigger(); END IF;
+ RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+CREATE TRIGGER trig_before_insert_kisi
+BEFORE INSERT ON "Kisi"
+FOR EACH ROW
+EXECUTE FUNCTION insert_kisi_check_duplicate();
+
+
+
+7)The procedure that brings the crime number of the defendant whose criminal identity number is entered and the crime He/she committed:
+(Tcsi girilen davalının sucnosunu ve islediği sucu getiren saklı yordam)
+
+CREATE OR REPLACE FUNCTION enkalabalikmahkeme()
+RETURNS TABLE (mahkeme_adi character varying, toplam_kisi integer) AS $$
+BEGIN
+ RETURN QUERY
+ SELECT "public"."Mahkeme"."MahkemeAdi", MAX("public"."MahkemeKisi"."ToplamKisi") AS 
+"ToplamKisiSayisi"
+ FROM "public"."Mahkeme"
+ JOIN "public"."MahkemeKisi" ON "public"."Mahkeme"."MahkemeNo" = 
+"public"."MahkemeKisi"."MahkemeNo"
+ GROUP BY "public"."Mahkeme"."MahkemeNo"
+ ORDER BY "ToplamKisiSayisi" DESC
+ LIMIT 1;
+END;
+$$ LANGUAGE plpgsql; 
+
+
+
+8)Bringing the crime number and crime type of crimes whose time of commission is unknown (null) 
+function: (İşlenme saati belli olmayan (null olan) suçların sucno sunu ve suc türünü getiren 
+fonksiyon)
+
+CREATE OR REPLACE FUNCTION public.İslenme_Saati_Bilinmeyen_Suclar()
+RETURNS TABLE("SucNo" character varying, "Tur" character varying) 
+AS
+$$
+BEGIN
+ RETURN QUERY
+ SELECT s."SucNo", s."Tur"
+ FROM "public"."DavaliSuc" ds
+ JOIN "public"."Suc" s ON ds."SucNo" = s."SucNo"
+ WHERE ds."Saat" IS NULL;
+ IF NOT FOUND THEN
+ RAISE NOTICE 'Saat bilinmeyen suc kaydı bulunmamaktadır.';
+ END IF;
+END;
+$$ LANGUAGE plpgsql;
