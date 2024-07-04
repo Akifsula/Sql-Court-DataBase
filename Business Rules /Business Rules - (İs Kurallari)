@@ -1,5 +1,50 @@
+For English:
+
+Courtrooms are composed of halls. The halls have capacity and block information and are distinguished by hall numbers.
+Courts have a court number and a name.
+Addresses are determined by their coordinates. Each address has city and district information.
+A court is located at only one address. An address may have no courts, or it may have multiple courts.
+A court has at least one and at most many people. A person can be part of zero to many courts.
+People are divided into officials and citizens. Each person is identified by a national ID number, and each person has a first name, last name, phone number, and gender.
+A person can be an official, a citizen, or both.
+The total number of people and personnel in the court should also be recorded.
+If a person is an official, they must be either a lawyer, judge, or prosecutor. If they are a citizen, they can be a defendant, plaintiff, or witness. They may also be none of these.
+Officials have registration numbers and are divided into judges, lawyers, and prosecutors based on their profession.
+Citizens have marital status (married, single) and email information. Citizens are categorized according to their roles (defendant, plaintiff, witness).
+A person is located at only one address. An address may have no people, or it may have multiple people.
+Judges have seniority levels, and lawyers have areas of expertise.
+Prosecutors have authority, workday, and working hour information.
+The gender and profession of plaintiffs are recorded.
+Defendant's age and criminal record (clean, dirty) are recorded.
+Witnesses have types of testimony information.
+A witness must testify in at least one crime. They can testify in multiple crimes. A crime may have no witnesses or multiple witnesses.
+A plaintiff files at least one and at most many lawsuits. A lawsuit is filed by at least one and at most one plaintiff.
+A plaintiff is defended by at least zero and at most one lawyer. A lawyer defends at least one and at most many plaintiffs.
+Lawsuits are distinguished by case numbers. Each lawsuit has a date and time.
+A judge oversees at least one and at most many lawsuits. A lawsuit is overseen by only one judge.
+Penalties are distinguished by penalty numbers, and each penalty has a type, amount, and deterrence level.
+A judge may issue no penalties or multiple penalties. A penalty is issued by only one judge.
+Crimes have numbers and types.
+A defendant may have committed no crimes or multiple crimes. A crime may not have been committed or may have been committed by multiple defendants.
+The date, time, and city information of the committed crimes are also important.
+Evidence is listed by evidence numbers. They have degrees (direct, indirect) and consistency characteristics.
+Evidence is found by only one prosecutor. A prosecutor may find no evidence or multiple pieces of evidence.
+A prosecutor may investigate at most one crime or not investigate any crime. A crime may not be investigated by any prosecutor or may be investigated by at most one prosecutor.
+A defendant may not be interrogated or may be interrogated by only one prosecutor. A prosecutor may interrogate multiple defendants or not interrogate any defendants.
+A defendant may not consult a lawyer or may consult multiple lawyers. A lawyer must be consulted by only one defendant.
+Case files are created by prosecutors and have decision numbers and minutes numbers. They are distinguished from each other by file numbers.
+A case file must be created by only one prosecutor. A prosecutor may create no case files or multiple case files.
+A lawyer must review at least one case file. They may review multiple case files. A case file is reviewed by only one lawyer.
+A file within the CaseFile table is associated with zero or more files simultaneously. A file must be associated with zero or one file.
+A plaintiff may not consult a lawyer or may consult multiple lawyers. A lawyer must be consulted by only one plaintiff.
+A defendant is defended by at least zero and at most one lawyer. A lawyer defends at least one and at most many defendants.
 
 
+
+
+
+
+For Turkish:
 
 Mahkeme Salonlardan oluşur. Salonların kapasitesi ve blok bilgisi mevcuttur ve birbirlerinden Salon numarasıyla ayrılırlar.
 Mahkemelerin Mahkeme numarası ve adı vardır.
@@ -49,33 +94,7 @@ bir davalı en az sıfır en çok bir avukat tarafından savunulur. Bir avukat e
 
 
 
-BEGIN;
 
--- CREATE TABLE "MahkemeKisi" ----------------------------------
-CREATE TABLE "public"."MahkemeKisi" ( 
-	"ToplamKisi" Integer NOT NULL,
-	"SucluSayisi" Integer NOT NULL,
-	"MahkemeNo" Integer NOT NULL,
-	"TcKimlikNo" Integer NOT NULL,
-	PRIMARY KEY ( "MahkemeNo", "TcKimlikNo" ),
-	CONSTRAINT "unique_MahkemeKisi_MahkemeNo" UNIQUE( "MahkemeNo" ),
-	CONSTRAINT "unique_MahkemeKisi_TcKimlikNo" UNIQUE( "TcKimlikNo" ) );
- ;
--- -------------------------------------------------------------
-
-COMMIT;
-
-BEGIN;
-
--- CREATE LINK "bulunur" ---------------------------------------
-ALTER TABLE "public"."MahkemeKisi"
-	ADD CONSTRAINT "bulunur" FOREIGN KEY ( "MahkemeNo" )
-	REFERENCES "public"."Mahkeme" ( "MahkemeNo" ) MATCH FULL
-	ON DELETE Cascade
-	ON UPDATE Cascade;
--- -------------------------------------------------------------
-
-COMMIT;
 
 
 
